@@ -1,0 +1,14 @@
+{
+  "slug": "starter",
+  "name": "Starter Mini-App",
+  "launch_url": "https://YOUR-DOMAIN.example/starter/",
+  "version": "1.0.0",
+  "description": "Стартовый шаблон мини-аппа X2Chat: контекст, capabilities, события, graceful-деградация.",
+  "category": "tools",
+  "scopes": [
+    "profile:read",
+    "contacts:pick",
+    "message:send"
+  ],
+  "icon": "https://YOUR-DOMAIN.example/starter/icon.png"
+}

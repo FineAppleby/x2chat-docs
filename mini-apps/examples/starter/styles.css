@@ -1,0 +1,42 @@
+/* X2Chat Mini-App starter — минимальные чистые стили, mobile-first, тёмная по умолчанию.
+   Тема подставляется из context.env.theme в body[data-theme]. */
+:root {
+  --bg: #0f1115; --card: #171a21; --line: #252a34; --fg: #e8ebf0; --muted: #8b93a3;
+  --accent: #4c8dff; --accent-fg: #fff; --ok: #3fd07f; --radius: 14px;
+}
+body[data-theme="light"] { --bg:#f5f7fb; --card:#fff; --line:#e6e9f0; --fg:#1a1d24; --muted:#6b7280; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--fg);
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.hdr { padding: 18px 16px 14px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--bg); }
+.hdr-title { font-weight: 700; font-size: 17px; }
+.hdr-sub { font-size: 13px; margin-top: 2px; }
+.muted { color: var(--muted); }
+
+.wrap { padding: 14px; display: flex; flex-direction: column; gap: 14px; max-width: 640px; margin: 0 auto; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+.card h2 { margin: 0 0 10px; font-size: 14px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+
+.row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; align-items: center; }
+.btn {
+  appearance: none; border: 1px solid var(--line); background: transparent; color: var(--fg);
+  padding: 10px 14px; border-radius: 10px; font-size: 14px; cursor: pointer; transition: .12s;
+}
+.btn:active { transform: scale(.97); }
+.btn-primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.btn-ghost { color: var(--muted); }
+.inp { flex: 1 1 180px; min-width: 0; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font-size: 14px; }
+
+.out { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin: 0; white-space: pre-wrap; word-break: break-word; font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--fg); }
+.out.small { max-height: 220px; overflow: auto; }
+
+.log { display: flex; flex-direction: column; gap: 4px; max-height: 180px; overflow: auto; font: 12px/1.5 ui-monospace, monospace; }
+.log-line { color: var(--muted); }
+
+.ftr { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 4px 2px 16px; font-size: 12px; }

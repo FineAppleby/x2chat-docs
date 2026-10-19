@@ -1,0 +1,706 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://x2chat.com/bots/bot-ui-schema.v1.json",
+  "title": "X2Chat Bot UI schema v1 (Bot API v2, phase 1)",
+  "description": "Request-level fields accepted by sendMessage / sendPhoto / editMessageText / editMessageReplyMarkup, plus bot-level settings (theme, start_button, menu_config) and the client bot-profile shape ($defs.botProfileUi).",
+  "x-version": 1,
+  "x-limits": {
+    "max_buttons_per_message": 100,
+    "max_buttons_per_row": 8,
+    "max_rows": 100,
+    "button_text_max": 64,
+    "callback_data_max_bytes": 64,
+    "badge_max": 8,
+    "persona_name_max": 32,
+    "url_max": 2048,
+    "description_max": 512,
+    "short_description_max": 120,
+    "theme_updates_per_minute": 1,
+    "gradient_colors": [
+      2,
+      3
+    ],
+    "start_button_text_max": 32,
+    "start_payload_max": 64,
+    "menu_button_text_max": 24,
+    "menu_item_text_max": 48,
+    "menu_item_description_max": 96,
+    "menu_items_max": 50,
+    "menu_depth_max": 3,
+    "menu_grid_columns_max": 4,
+    "composer_buttons_max": 6,
+    "menu_json_max_bytes": 65536
+  },
+  "x-contrast": {
+    "chat_bubble_light": "#FFFFFF",
+    "chat_bubble_dark": "#121212",
+    "text_min_ratio": 4.5,
+    "shape_min_ratio": 1.5,
+    "accent_min_ratio": 3.0,
+    "rule": "Button/bubble text vs its (alpha-composited) background >= 4.5:1 on both light and dark bubbles; a button's background or border must reach >= 1.5:1 against each bubble background. Violations are auto-corrected deterministically and reported in the API response `warnings`."
+  },
+  "$defs": {
+    "color": {
+      "type": "string",
+      "pattern": "^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+      "description": "#RRGGBB or #RRGGBBAA (alpha last)."
+    },
+    "httpsUrl": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "maxLength": 2048
+    },
+    "style": {
+      "enum": [
+        "primary",
+        "secondary",
+        "success",
+        "danger",
+        "ghost",
+        "link"
+      ]
+    },
+    "shape": {
+      "enum": [
+        "rounded",
+        "pill",
+        "square"
+      ]
+    },
+    "size": {
+      "enum": [
+        "s",
+        "m",
+        "l"
+      ]
+    },
+    "icon": {
+      "type": "object",
+      "description": "Exactly one of emoji | symbol (built-in Material Symbols name) | url (https image, rendered <= 64px).",
+      "additionalProperties": false,
+      "properties": {
+        "emoji": {
+          "type": "string",
+          "maxLength": 16
+        },
+        "symbol": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]{1,48}$"
+        },
+        "url": {
+          "$ref": "#/$defs/httpsUrl"
+        }
+      },
+      "minProperties": 1,
+      "maxProperties": 1
+    },
+    "inlineKeyboardButton": {
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "callback_data": {
+          "type": "string",
+          "description": "<= 64 bytes UTF-8 (Telegram)"
+        },
+        "url": {
+          "type": "string",
+          "description": "Telegram v1 field, passed through as-is"
+        },
+        "switch_inline_query": {
+          "type": "string"
+        },
+        "switch_inline_query_current_chat": {
+          "type": "string"
+        },
+        "send_text": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "description": "X2Chat extension (2026-09-14)"
+        },
+        "text_i18n": {
+          "type": "object",
+          "propertyNames": {
+            "enum": ["ru", "en", "es", "de", "fr", "zh", "ar"]
+          },
+          "additionalProperties": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "description": "X2Chat extension (2026-10-09): label translations; the client shows the interface language, then en, then `text`. Unknown languages are dropped, long values truncated to 64 chars. ui_features: button_text_i18n"
+        },
+        "copy_text": {
+          "type": [
+            "object",
+            "string"
+          ],
+          "properties": {
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          "description": "Telegram Bot API (2026-10-04): tap copies text to the clipboard; string = X2Chat shorthand for {text}"
+        },
+        "web_app": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "$ref": "#/$defs/httpsUrl"
+            }
+          }
+        },
+        "login_url": {
+          "type": "object"
+        },
+        "style": {
+          "$ref": "#/$defs/style"
+        },
+        "color": {
+          "$ref": "#/$defs/color"
+        },
+        "text_color": {
+          "$ref": "#/$defs/color"
+        },
+        "border_color": {
+          "$ref": "#/$defs/color"
+        },
+        "shape": {
+          "$ref": "#/$defs/shape"
+        },
+        "size": {
+          "$ref": "#/$defs/size"
+        },
+        "icon": {
+          "$ref": "#/$defs/icon"
+        },
+        "width": {
+          "enum": [
+            "auto",
+            "full"
+          ]
+        },
+        "disabled": {
+          "type": "boolean"
+        },
+        "selected": {
+          "type": "boolean"
+        },
+        "badge": {
+          "type": "string",
+          "maxLength": 8
+        }
+      }
+    },
+    "inlineKeyboardMarkup": {
+      "type": "object",
+      "properties": {
+        "inline_keyboard": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/$defs/inlineKeyboardButton"
+            }
+          },
+          "description": "Total buttons across rows <= 100 (hard limit, 400)."
+        },
+        "layout": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "columns": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 8
+            },
+            "gap": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 24,
+              "description": "logical px"
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "end",
+                "stretch"
+              ]
+            }
+          }
+        },
+        "one_time": {
+          "type": "boolean",
+          "description": "After the first callback the server marks the keyboard used and removes it for every device (chat_message_edited)."
+        },
+        "selected_callback": {
+          "type": "boolean",
+          "description": "With one_time: instead of removing, keep the keyboard with the pressed button selected and all buttons disabled."
+        }
+      }
+    },
+    "persona": {
+      "type": "object",
+      "description": "Message-level `as`: a character speaking on behalf of the bot. Server adds is_persona:true, bot_id, bot_username; clients must always show the bot owner label.",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "avatar_url": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "avatar_emoji": {
+          "type": "string",
+          "maxLength": 16
+        },
+        "color": {
+          "$ref": "#/$defs/color"
+        }
+      }
+    },
+    "bubble": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "color": {
+          "$ref": "#/$defs/color"
+        },
+        "text_color": {
+          "$ref": "#/$defs/color"
+        },
+        "accent": {
+          "$ref": "#/$defs/color"
+        }
+      }
+    },
+    "callbackEffect": {
+      "enum": [
+        "haptic",
+        "sound",
+        "confetti",
+        "shake"
+      ]
+    },
+    "buttonDefaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "style": {
+          "$ref": "#/$defs/style"
+        },
+        "shape": {
+          "$ref": "#/$defs/shape"
+        },
+        "size": {
+          "$ref": "#/$defs/size"
+        },
+        "color": {
+          "$ref": "#/$defs/color"
+        },
+        "text_color": {
+          "$ref": "#/$defs/color"
+        },
+        "border_color": {
+          "$ref": "#/$defs/color"
+        }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "description": "setMyTheme payload; applied to the whole chat with the bot.",
+      "additionalProperties": false,
+      "properties": {
+        "accent": {
+          "$ref": "#/$defs/color"
+        },
+        "background": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Exactly one of color | image_url | gradient.",
+          "properties": {
+            "color": {
+              "$ref": "#/$defs/color"
+            },
+            "image_url": {
+              "$ref": "#/$defs/httpsUrl"
+            },
+            "gradient": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 3,
+              "items": {
+                "$ref": "#/$defs/color"
+              }
+            }
+          },
+          "maxProperties": 1
+        },
+        "bubble": {
+          "$ref": "#/$defs/bubble"
+        },
+        "button_defaults": {
+          "$ref": "#/$defs/buttonDefaults"
+        }
+      }
+    },
+    "startButton": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "setMyStartButton. Client contract: while the user has not sent anything in the bot chat, show a big Start button instead of the composer; tap sends `/start` (or `/start <payload>`) as a normal user message. text omitted → localized default ('Start' / 'Начать').",
+      "properties": {
+        "text": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "payload": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        }
+      }
+    },
+    "botCommand": {
+      "type": "object",
+      "required": [
+        "command",
+        "description"
+      ],
+      "description": "Client menu entry from setMyCommands (localized server-side by language_code). Tap sends `/<command>` as a user message.",
+      "properties": {
+        "command": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]{1,32}$"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 256
+        }
+      }
+    },
+    "menuAction": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "description": "command → send `/<command>` as user message; text → send text as user message; callback → POST /api/v1/bot-callbacks/send {chat_id, bot_id, callback_data, source:'menu'} (bot gets callback_query with message:null, source:'menu', menu_item_id); url → open https; web_app → open mini-app https; submenu → open nested items; share → system share sheet with text.",
+      "oneOf": [
+        {
+          "properties": {
+            "type": {
+              "const": "command"
+            },
+            "command": {
+              "type": "string",
+              "pattern": "^/?[a-zA-Z0-9_]{1,32}$"
+            }
+          },
+          "required": [
+            "type",
+            "command"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "const": "text"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "required": [
+            "type",
+            "text"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "const": "callback"
+            },
+            "data": {
+              "type": "string",
+              "minLength": 1,
+              "description": "<= 64 bytes UTF-8"
+            }
+          },
+          "required": [
+            "type",
+            "data"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "const": "url"
+            },
+            "url": {
+              "$ref": "#/$defs/httpsUrl"
+            }
+          },
+          "required": [
+            "type",
+            "url"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "const": "web_app"
+            },
+            "url": {
+              "$ref": "#/$defs/httpsUrl"
+            }
+          },
+          "required": [
+            "type",
+            "url"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "const": "submenu"
+            },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/menuItem"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "items"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "const": "share"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          },
+          "required": [
+            "type",
+            "text"
+          ]
+        }
+      ]
+    },
+    "menuItem": {
+      "type": "object",
+      "required": [
+        "text",
+        "action"
+      ],
+      "description": "Unique id per config (auto 'm<N>'/'c<N>' when omitted). Depth <= 3, <= 50 items in the whole config.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,32}$"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 96
+        },
+        "icon": {
+          "$ref": "#/$defs/icon"
+        },
+        "style": {
+          "$ref": "#/$defs/style"
+        },
+        "color": {
+          "$ref": "#/$defs/color"
+        },
+        "text_color": {
+          "$ref": "#/$defs/color"
+        },
+        "border_color": {
+          "$ref": "#/$defs/color"
+        },
+        "action": {
+          "$ref": "#/$defs/menuAction"
+        }
+      }
+    },
+    "menuConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "setMyMenu (+ scope default|{type:'chat',chat_id} and language_code variants). If present, the client shows this menu instead of the plain commands list; composer_buttons are quick buttons above/next to the composer in the bot chat.",
+      "properties": {
+        "menu": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "items"
+          ],
+          "properties": {
+            "button": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "maxLength": 24
+                },
+                "icon": {
+                  "$ref": "#/$defs/icon"
+                },
+                "style": {
+                  "$ref": "#/$defs/style"
+                },
+                "color": {
+                  "$ref": "#/$defs/color"
+                },
+                "text_color": {
+                  "$ref": "#/$defs/color"
+                },
+                "border_color": {
+                  "$ref": "#/$defs/color"
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 50,
+              "items": {
+                "$ref": "#/$defs/menuItem"
+              }
+            },
+            "layout": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "enum": [
+                    "list",
+                    "grid"
+                  ]
+                },
+                "columns": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4
+                }
+              }
+            }
+          }
+        },
+        "composer_buttons": {
+          "type": "array",
+          "maxItems": 6,
+          "items": {
+            "$ref": "#/$defs/menuItem"
+          }
+        }
+      }
+    },
+    "botProfileUi": {
+      "type": "object",
+      "description": "UI part of GET /api/v1/bots/by-username/:username[?chat_id=&language_code=] (and bots[] of /in-chat/:chatId): what the client needs to open a bot chat.",
+      "properties": {
+        "theme": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/theme"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "start_button": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/startButton"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "start_command": {
+          "type": "string"
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/botCommand"
+          }
+        },
+        "menu": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/menuConfig"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "short_description": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "reply_markup": {
+      "$ref": "#/$defs/inlineKeyboardMarkup"
+    },
+    "as": {
+      "$ref": "#/$defs/persona"
+    },
+    "bubble": {
+      "$ref": "#/$defs/bubble"
+    },
+    "effect": {
+      "$ref": "#/$defs/callbackEffect"
+    },
+    "theme": {
+      "$ref": "#/$defs/theme"
+    },
+    "start_button": {
+      "$ref": "#/$defs/startButton"
+    },
+    "menu_config": {
+      "$ref": "#/$defs/menuConfig"
+    }
+  }
+}

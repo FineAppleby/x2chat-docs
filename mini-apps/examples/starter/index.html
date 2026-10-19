@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>X2Chat Mini-App — Starter</title>
+  <link rel="icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hdr">
+    <div class="hdr-title">X2Chat Mini-App · Starter</div>
+    <div class="hdr-sub" id="whoami">…</div>
+    <div class="hdr-sub muted" id="chatinfo">…</div>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <h2>Действия</h2>
+      <div class="row">
+        <button id="btn-profile" class="btn">Профиль</button>
+        <button id="btn-contacts" class="btn">Выбрать контакт</button>
+        <button id="btn-share" class="btn">Поделиться</button>
+      </div>
+      <div class="row">
+        <input id="msg" class="inp" placeholder="Текст в текущий чат…" value="Привет из мини-аппа 👋">
+        <button id="btn-message" class="btn btn-primary">Отправить</button>
+      </div>
+      <pre id="out" class="out">Нажмите действие — результат появится здесь.</pre>
+    </section>
+
+    <section class="card">
+      <h2>Контекст запуска</h2>
+      <pre id="ctx" class="out small">…</pre>
+    </section>
+
+    <section class="card">
+      <h2>Журнал событий</h2>
+      <div id="log" class="log"></div>
+    </section>
+
+    <footer class="ftr">
+      <button id="btn-close" class="btn btn-ghost">Закрыть приложение</button>
+      <span class="muted">Потяните вниз — сработает x2chat:refresh</span>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

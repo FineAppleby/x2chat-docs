@@ -1,0 +1,794 @@
+{
+  "schema": "x2-mini-app-capabilities/2",
+  "apiVersion": 2,
+  "description": "Machine-readable source of truth for the X2Chat Mini-Apps Host API v2. Each capability is a typed, composable action: explicit input, typed output, least-privilege scope, a networkDependent flag (for offline behaviour) and a purpose string shown in the consent dialog.",
+  "scopes": [
+    {
+      "name": "identity.profile.read",
+      "aliases": [
+        "profile:read"
+      ],
+      "purpose": {
+        "ru": "Читать ваш профиль (имя, аватар)",
+        "en": "Read your profile (name, avatar)"
+      }
+    },
+    {
+      "name": "identity.contacts.pick",
+      "aliases": [
+        "contacts:pick"
+      ],
+      "purpose": {
+        "ru": "Открывать выбор контакта",
+        "en": "Open contact picker"
+      }
+    },
+    {
+      "name": "identity.contacts.resolve",
+      "aliases": [
+        "contacts:pick"
+      ],
+      "purpose": {
+        "ru": "Находить контакт по идентификатору",
+        "en": "Resolve a contact by identifier"
+      }
+    },
+    {
+      "name": "context.chat.read",
+      "aliases": [
+        "chat:context"
+      ],
+      "purpose": {
+        "ru": "Знать текущий чат",
+        "en": "Read the current chat"
+      }
+    },
+    {
+      "name": "messaging.compose",
+      "aliases": [
+        "message:send"
+      ],
+      "purpose": {
+        "ru": "Готовить черновик сообщения",
+        "en": "Compose a message draft"
+      }
+    },
+    {
+      "name": "messaging.send",
+      "aliases": [
+        "message:send"
+      ],
+      "purpose": {
+        "ru": "Отправлять сообщения от вашего имени",
+        "en": "Send messages on your behalf"
+      }
+    },
+    {
+      "name": "voice.personas.read",
+      "aliases": [
+        "voice:personas:read"
+      ],
+      "purpose": {
+        "ru": "Читать список голосов",
+        "en": "Read voice personas"
+      }
+    },
+    {
+      "name": "voice.personas.set",
+      "aliases": [
+        "voice:persona:set"
+      ],
+      "purpose": {
+        "ru": "Менять голос",
+        "en": "Change the voice persona"
+      }
+    }
+  ],
+  "capabilities": [
+    {
+      "name": "profile.read",
+      "scope": "identity.profile.read",
+      "aliases": [
+        "profile:read"
+      ],
+      "where": "backend",
+      "networkDependent": true,
+      "offline": "cache",
+      "input": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+      },
+      "output": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "slotId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "displayName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "username": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "avatarUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "theme": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "contacts.pick",
+      "scope": "identity.contacts.pick",
+      "aliases": [
+        "contacts:pick"
+      ],
+      "where": "client+backend",
+      "networkDependent": true,
+      "offline": "cache",
+      "input": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "filter": {
+            "enum": [
+              "direct",
+              "any"
+            ],
+            "default": "any"
+          }
+        }
+      },
+      "output": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/Contact"
+          },
+          {
+            "type": "object",
+            "required": [
+              "cancelled"
+            ],
+            "properties": {
+              "cancelled": {
+                "const": true
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "contacts.resolve",
+      "scope": "identity.contacts.resolve",
+      "aliases": [],
+      "where": "backend",
+      "networkDependent": true,
+      "offline": "cache",
+      "input": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "by"
+        ],
+        "properties": {
+          "by": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "userId": {
+                    "type": "number"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "slotId"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "slotId": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "chatId"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "chatId": {
+                    "type": "number"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "output": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/Contact"
+          },
+          {
+            "type": "object",
+            "required": [
+              "error"
+            ],
+            "properties": {
+              "error": {
+                "enum": [
+                  "not_a_contact",
+                  "no_peer",
+                  "self",
+                  "bad_contact",
+                  "no_chat_context"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "chat.current",
+      "scope": "context.chat.read",
+      "aliases": [
+        "chat:context"
+      ],
+      "where": "backend",
+      "networkDependent": true,
+      "offline": "cache",
+      "input": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+      },
+      "output": {
+        "type": "object",
+        "required": [
+          "chat"
+        ],
+        "properties": {
+          "chat": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "message.compose",
+      "scope": "messaging.compose",
+      "aliases": [
+        "message:send"
+      ],
+      "where": "backend",
+      "networkDependent": true,
+      "offline": "error",
+      "input": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 8000
+          },
+          "target": {
+            "$ref": "#/$defs/Target"
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "required": [
+          "valid"
+        ],
+        "properties": {
+          "valid": {
+            "type": "boolean"
+          },
+          "draft": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              }
+            }
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "message.send",
+      "scope": "messaging.send",
+      "aliases": [
+        "message:send"
+      ],
+      "where": "client",
+      "networkDependent": true,
+      "offline": "queue",
+      "note": "target ОБЯЗАТЕЛЕН (Apple: явный параметр, не имплицитный контекст). v1-алиас message:send без target падает на context.chat ТОЛЬКО под apiVersion=1.",
+      "input": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "text",
+          "target"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 8000
+          },
+          "target": {
+            "$ref": "#/$defs/Target"
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "required": [
+          "sent"
+        ],
+        "properties": {
+          "sent": {
+            "type": "boolean"
+          },
+          "queued": {
+            "type": "boolean"
+          },
+          "chatId": {
+            "type": "number"
+          },
+          "messageId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "message.notify",
+      "scope": null,
+      "auth": "app-key",
+      "aliases": [
+        "host/notify"
+      ],
+      "where": "s2s",
+      "networkDependent": true,
+      "offline": "n/a",
+      "note": "Server-to-server. Контракт уже реализован: POST /api/v1/mini-apps/host/notify (X-X2Chat-App-Key). См. mini-apps-notify-service.js.",
+      "input": {
+        "type": "object",
+        "required": [
+          "to",
+          "push"
+        ],
+        "properties": {
+          "to": {
+            "oneOf": [
+              {
+                "required": [
+                  "user_id"
+                ]
+              },
+              {
+                "required": [
+                  "slot_id"
+                ]
+              }
+            ]
+          },
+          "push": {
+            "type": "object",
+            "required": [
+              "title"
+            ],
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "body": {
+                "type": "string"
+              }
+            }
+          },
+          "deeplink": {
+            "type": "string"
+          },
+          "dedup_key": {
+            "type": "string"
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "pushed": {
+            "type": "boolean"
+          },
+          "deduped": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    {
+      "name": "share.toChat",
+      "scope": null,
+      "aliases": [
+        "share:forward"
+      ],
+      "where": "client",
+      "networkDependent": true,
+      "offline": "queue",
+      "note": "Host-mediated UI (нативный пикер чата), отдельный scope не нужен.",
+      "input": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "output": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "shared"
+            ],
+            "properties": {
+              "shared": {
+                "const": true
+              },
+              "chatId": {
+                "type": "number"
+              },
+              "queued": {
+                "type": "boolean"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "cancelled"
+            ],
+            "properties": {
+              "cancelled": {
+                "const": true
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "share.external",
+      "scope": null,
+      "aliases": [
+        "share:external"
+      ],
+      "where": "client",
+      "networkDependent": false,
+      "offline": "ok",
+      "note": "Системный share-лист (Android Intent / iOS UIActivity). Единственная capability, работающая полностью офлайн.",
+      "input": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "shared": {
+            "type": "boolean"
+          },
+          "cancelled": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    {
+      "name": "voice.personas.read",
+      "scope": "voice.personas.read",
+      "aliases": [
+        "voice:personas:read"
+      ],
+      "where": "backend",
+      "networkDependent": true,
+      "offline": "cache",
+      "input": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+      },
+      "output": {
+        "type": "object",
+        "required": [
+          "personas"
+        ],
+        "properties": {
+          "personas": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "engine": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "voice.personas.set",
+      "scope": "voice.personas.set",
+      "aliases": [
+        "voice:persona:set"
+      ],
+      "where": "client+backend",
+      "networkDependent": false,
+      "offline": "ok",
+      "note": "DSP-применение персонажа локально → работает офлайн; backend только валидирует id.",
+      "input": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "personaId"
+        ],
+        "properties": {
+          "personaId": {
+            "type": "string"
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "required": [
+          "ok"
+        ],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "personaId": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "engine": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "session.refresh",
+      "scope": null,
+      "aliases": [
+        "session:refresh"
+      ],
+      "where": "client",
+      "networkDependent": true,
+      "offline": "error",
+      "note": "Session management, не capability-право. Токен НЕ отдаётся в JS — контейнер ре-инжектит сам (token-broker _reissueSession).",
+      "input": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+      },
+      "output": {
+        "type": "object",
+        "required": [
+          "refreshed"
+        ],
+        "properties": {
+          "refreshed": {
+            "type": "boolean"
+          },
+          "expiresInSec": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  ],
+  "hostEvents": [
+    {
+      "name": "x2chat:ready",
+      "detail": "window.X2Chat.launch (context v2)",
+      "when": "после инжекта/переиздания сессии"
+    },
+    {
+      "name": "x2chat:refresh",
+      "detail": null,
+      "when": "pull-to-refresh; апп отвечает _refreshHandled"
+    },
+    {
+      "name": "x2chat:back",
+      "detail": null,
+      "when": "кнопка назад при canGoBack"
+    },
+    {
+      "name": "x2chat:exitRequest",
+      "detail": null,
+      "when": "назад/крестик при confirmExit"
+    },
+    {
+      "name": "x2chat:session",
+      "detail": {
+        "state": "active|expiring|expired"
+      },
+      "when": "переиздание сессии"
+    }
+  ],
+  "$defs": {
+    "Contact": {
+      "type": "object",
+      "required": [
+        "userId",
+        "isGroup"
+      ],
+      "properties": {
+        "userId": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "slotId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "displayName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "isGroup": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Target": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "chatId"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "chatId": {
+              "type": "number"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "slotId"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "slotId": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
